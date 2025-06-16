@@ -187,7 +187,7 @@ def show_result(update: Update, context: CallbackContext):
 
 app = Flask(__name__)
 
-@app.route('/ping')
+@app.route('/ping', methods=['GET', 'HEAD'])
 def ping():
     return 'pong', 200
 
