@@ -1,5 +1,7 @@
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from flask import Flask
+import threading
 
 TOKEN = '7600734297:AAEUfHpSLgxMyRj8vxC8rto3upyB9hVC2ys'  # Вставь токен от BotFather
 
@@ -182,7 +184,19 @@ def show_result(update: Update, context: CallbackContext):
     )
     user_data.pop(user_id)
 
+
+app = Flask(__name__)
+
+@app.route('/ping')
+def ping():
+    return 'pong', 200
+
+def run_flask():
+    app.run(host='0.0.0.0', port=8080)
+
+
 def main():
+    threading.Thread(target=run_flask).start()
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
