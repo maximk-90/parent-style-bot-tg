@@ -242,7 +242,7 @@ _Хочется лучше понять себя и своего ребенка?
 
     buttons = [
         [InlineKeyboardButton("🎯 Хочу на интенсив", url="https://kids-psy.ru/intensive/relaunch")],
-        [InlineKeyboardButton("🔁 Пройти тест ещё раз", switch_inline_query_current_chat="/start_test")]
+        [InlineKeyboardButton("🔁 Пройти тест ещё раз", url="https://t.me/ParentStyleBot?start=start_test")]
     ]
 
     update.message.reply_text(
