@@ -121,12 +121,13 @@ def start(update: Update, context: CallbackContext):
         one_time_keyboard=True
     )
 
+    name = update.effective_user.first_name
+
     update.message.reply_text(
         f"Привет, {name}!\n"
         "Хотите узнать, какой у вас стиль воспитания и как он влияет на ребенка?\n\n"
-        "Пройти тест (10 вопросов)",
+        "Нажмите кнопку ниже, чтобы пройти тест (10 вопросов):",
         reply_markup=keyboard
-    ) → /start_test"
     )
 
 def start_test(update: Update, context: CallbackContext):
