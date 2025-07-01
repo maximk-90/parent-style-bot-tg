@@ -110,11 +110,25 @@ answer_map = {
 user_data = {}
 
 def start(update: Update, context: CallbackContext):
-    name = update.message.from_user.first_name
+    args = context.args
+    if args and args[0] == "start_test":
+        return start_test(update, context)
+
+    from telegram import ReplyKeyboardMarkup
+    keyboard = ReplyKeyboardMarkup(
+        [['🚀 Начать тест']],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+
     update.message.reply_text(
-        f"Привет, {name}!\n"
-        "Хотите узнать, какой у вас стиль воспитания и как он влияет на ребенка?\n\n"
-        "Пройти тест (10 вопросов) → /start_test"
+        "Привет!
+
+Хотите узнать, какой у вас стиль воспитания и как он влияет на ребенка?
+"
+        "Пройдите короткий тест, нажав на кнопку ниже 👇",
+        reply_markup=keyboard
+    ) → /start_test"
     )
 
 def start_test(update: Update, context: CallbackContext):
@@ -138,6 +152,8 @@ def send_question(update: Update, context: CallbackContext):
         show_result(update, context)
 
 def handle_answer(update: Update, context: CallbackContext):
+    if update.message.text == "🚀 Начать тест":
+        return start_test(update, context)
     user_id = update.message.from_user.id
     text = update.message.text
     data = user_data.get(user_id)
