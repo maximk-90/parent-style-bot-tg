@@ -164,7 +164,8 @@ def handle_answer(update: Update, context: CallbackContext):
     if not data:
         update.message.reply_text("Пожалуйста, начните с /start_test")
         return
-    # Определим номер выбранного ответа
+    q_num = data["current_q"]
+    q_data = questions[q_num]
     for i in range(4):
         if text.startswith(str(i + 1)):
             data["answers"].append(q_data["styles"][i])
@@ -174,6 +175,7 @@ def handle_answer(update: Update, context: CallbackContext):
         return
     data["current_q"] += 1
     send_question(update, context)
+
 
 def show_result(update: Update, context: CallbackContext):
     from telegram import InlineKeyboardMarkup, InlineKeyboardButton
