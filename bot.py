@@ -111,10 +111,30 @@ user_data = {}
 
 def start(update: Update, context: CallbackContext):
     args = context.args
+    user_id = update.effective_user.id
+
+    # 👇 Канал, на который должна быть подписка
+    channel_username = "@You_are_a_good_mom"
+
+    # Проверка подписки
+    try:
+        member = context.bot.get_chat_member(chat_id=channel_username, user_id=user_id)
+        if member.status not in ['member', 'administrator', 'creator']:
+            raise Exception("Not subscribed")
+    except:
+        from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📢 Подписаться на канал", url=f"https://t.me/{channel_username.strip('@')}")]
+        ])
+        update.message.reply_text(
+            "😔 Для прохождения теста подпишитесь на наш канал и вернитесь сюда.",
+            reply_markup=keyboard
+        )
+        return
+
     if args and args[0] == "start_test":
         return start_test(update, context)
 
-    from telegram import ReplyKeyboardMarkup
     keyboard = ReplyKeyboardMarkup(
         [['🚀 Начать тест']],
         resize_keyboard=True,
@@ -122,7 +142,6 @@ def start(update: Update, context: CallbackContext):
     )
 
     name = update.effective_user.first_name
-
     update.message.reply_text(
         f"Привет, {name}!\n"
         "Хотите узнать, какой у вас стиль воспитания и как он влияет на ребенка?\n\n"
@@ -267,7 +286,7 @@ _Хочется лучше понять себя и своего ребенка?
     )
     user_data.pop(user_id)
 
-
+# --- Flask and polling
 app = Flask(__name__)
 
 @app.route('/ping', methods=['GET', 'HEAD'])
@@ -276,7 +295,6 @@ def ping():
 
 def run_flask():
     app.run(host='0.0.0.0', port=8080)
-
 
 def main():
     threading.Thread(target=run_flask).start()
@@ -291,5 +309,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
