@@ -109,14 +109,9 @@ answer_map = {
 
 user_data = {}
 
-def start(update: Update, context: CallbackContext):
-    args = context.args
+def check_subscription(update, context):
     user_id = update.effective_user.id
-
-    # 👇 Канал, на который должна быть подписка
     channel_username = "@You_are_a_good_mom"
-
-    # Проверка подписки
     try:
         member = context.bot.get_chat_member(chat_id=channel_username, user_id=user_id)
         if member.status not in ['member', 'administrator', 'creator']:
@@ -130,17 +125,20 @@ def start(update: Update, context: CallbackContext):
             "😔 Для прохождения теста подпишитесь на наш канал и вернитесь сюда.",
             reply_markup=keyboard
         )
-        return
+        return False
+    return True
 
+def start(update: Update, context: CallbackContext):
+    args = context.args
+    if not check_subscription(update, context):
+        return
     if args and args[0] == "start_test":
         return start_test(update, context)
-
     keyboard = ReplyKeyboardMarkup(
         [['🚀 Начать тест']],
         resize_keyboard=True,
         one_time_keyboard=True
     )
-
     name = update.effective_user.first_name
     update.message.reply_text(
         f"Привет, {name}!\n"
@@ -150,6 +148,8 @@ def start(update: Update, context: CallbackContext):
     )
 
 def start_test(update: Update, context: CallbackContext):
+    if not check_subscription(update, context):
+        return
     user_id = update.message.from_user.id
     user_data[user_id] = {
         "current_q": 0,
@@ -178,7 +178,6 @@ def handle_answer(update: Update, context: CallbackContext):
     if not data:
         update.message.reply_text("Пожалуйста, начните с /start_test")
         return
-
     # Определим номер выбранного ответа
     for i in range(4):
         if text.startswith(str(i + 1)):
@@ -187,7 +186,6 @@ def handle_answer(update: Update, context: CallbackContext):
     else:
         update.message.reply_text("Пожалуйста, выберите один из вариантов.")
         return
-
     data["current_q"] += 1
     send_question(update, context)
 
@@ -199,7 +197,6 @@ def show_result(update: Update, context: CallbackContext):
     for a in answers:
         style_count[answer_map[a]] += 1
     style = max(style_count, key=style_count.get)
-
     result_texts = {
         "Авторитарный": """🔹 *У вас преобладает Авторитарный стиль:*
 «Кажется, вы привыкли к строгим правилам…»
@@ -218,7 +215,6 @@ _Хочется лучше понять себя и своего ребенка?
 🔹 Достаточно пары спокойных минут в день.
 
 👉 Узнайте, что вас ждет, кому подходит и какой результат даст — по кнопке ниже:_""",
-
         "Авторитетный": """🔹 *У вас преобладает Авторитетный стиль:*
 «Вы — мастер баланса!»
 
@@ -236,7 +232,6 @@ _Хочется лучше понять себя и своего ребенка?
 🔹 Достаточно пары спокойных минут в день.
 
 👉 Узнайте, что вас ждет, кому подходит и какой результат даст — по кнопке ниже:_""",
-
         "Либеральный": """🔹 *У вас преобладает Либеральный стиль:*
 «Вы — друг своему ребёнку…»
 
@@ -254,7 +249,6 @@ _Хочется лучше понять себя и своего ребенка?
 🔹 Достаточно пары спокойных минут в день.
 
 👉 Узнайте, что вас ждет, кому подходит и какой результат даст — по кнопке ниже:_""",
-
         "Индифферентный": """🔹 *У вас преобладает Индифферентный стиль:*
 «Вы редко вмешиваетесь в жизнь ребёнка…»
 
@@ -273,12 +267,10 @@ _Хочется лучше понять себя и своего ребенка?
 
 👉 Узнайте, что вас ждет, кому подходит и какой результат даст — по кнопке ниже:_"""
     }
-
     buttons = [
         [InlineKeyboardButton("🎯 Хочу на интенсив", url="https://kids-psy.ru/intensive/relaunch")],
         [InlineKeyboardButton("🔁 Пройти тест ещё раз", url="https://t.me/ParentStyleBot?start=start_test")]
     ]
-
     update.message.reply_text(
         result_texts[style],
         parse_mode='Markdown',
