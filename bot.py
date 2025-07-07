@@ -130,7 +130,7 @@ def start(update: Update, context: CallbackContext):
     update.message.reply_text(
         f"Привет, {name}!\n"
         "Хотите узнать, какой у вас стиль воспитания и как он влияет на ребенка?\n\n"
-        "Нажмите кнопку ниже, чтобы пройти тест (10 вопросов):",
+        "Нажмите кнопку ниже, чтобы пройти тест (11 вопросов):",
         reply_markup=keyboard
     )
 
